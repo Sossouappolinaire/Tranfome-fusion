@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fusion Transfert — Envoyer de l'argent</title>
-  <meta name="description" content="Transférez de l'argent vers un autre réseau Mobile Money, dans tous les pays pris en charge par FusionMoney." />
+  <title>Kouamé Paiement — Réseau vers autre</title>
+  <meta name="description" content="Transférez de l'argent Mobile Money d'un réseau vers un autre, dans n'importe quel pays pris en charge." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,85 +15,146 @@
   <div class="scene">
     <div class="scene__glow"></div>
 
-    <header class="hero">
-      <span class="hero__mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" width="30" height="30">
-          <path d="M4 16 L16 4 L28 16 L16 28 Z" fill="none" stroke="currentColor" stroke-width="2.4"/>
-          <path d="M4 16 L28 16" stroke="currentColor" stroke-width="2.4"/>
-        </svg>
-      </span>
-      <h1>Fusion Transfert</h1>
-      <p class="hero__tag">Envoyez de l'argent d'un réseau Mobile Money à un autre, partout où FusionMoney opère.</p>
-    </header>
-
     <main class="card" id="card">
 
-      <ol class="steps" id="steps" aria-label="Étapes du transfert">
-        <li class="steps__item is-active" data-step="form">Détails</li>
-        <li class="steps__item" data-step="pending">Traitement</li>
-        <li class="steps__item" data-step="done">Terminé</li>
-      </ol>
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="brand__name">Kouamé Paiement</span>
+      </div>
 
-      <!-- ÉTAPE 1 : formulaire -->
+      <!-- ===================== ÉTAPE(S) FORMULAIRE (assistant 5 étapes) ===================== -->
       <section class="panel" id="panel-form">
+
+        <ol class="dots" id="dots" aria-hidden="true">
+          <li class="dots__item" data-dot="1"></li>
+          <li class="dots__item" data-dot="2"></li>
+          <li class="dots__item" data-dot="3"></li>
+          <li class="dots__item" data-dot="4"></li>
+          <li class="dots__item" data-dot="5"></li>
+        </ol>
+
         <form id="transfer-form" novalidate>
 
-          <p class="section-title">Vous (expéditeur)</p>
+          <!-- Étape 1 : expéditeur -->
+          <fieldset class="wizard-step is-active" data-substep="1">
+            <h2 class="step-title">Vous êtes l'expéditeur</h2>
+            <p class="step-sub">D'où envoyez-vous l'argent ?</p>
 
-          <div class="field">
-            <label for="sender-name">Votre nom</label>
-            <input type="text" id="sender-name" name="senderName" placeholder="Ex : Jean Dupont" required />
-          </div>
-
-          <div class="field">
-            <label for="sender-phone">Votre numéro Mobile Money</label>
-            <input type="tel" id="sender-phone" name="senderPhone" placeholder="Numéro sur lequel vous payez" required />
-            <p class="hint">C'est le numéro qui sera débité pour financer le transfert.</p>
-          </div>
-
-          <p class="section-title">Destinataire</p>
-
-          <div class="field">
-            <label for="country">Pays du destinataire</label>
-            <select id="country" name="country" required disabled>
-              <option value="">Chargement des pays…</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label id="network-label">Réseau à créditer</label>
-            <div class="network-grid" id="network-grid" role="radiogroup" aria-labelledby="network-label">
-              <p class="hint">Sélectionnez d'abord un pays.</p>
+            <div class="field">
+              <label for="sender-country">Pays expéditeur</label>
+              <select id="sender-country" name="senderCountry" required disabled>
+                <option value="">Chargement des pays…</option>
+              </select>
             </div>
-          </div>
 
-          <div class="field">
-            <label for="phone">Numéro du destinataire</label>
-            <input type="tel" id="phone" name="phone" placeholder="Ex : 0102030405" required />
-            <p class="hint" id="phone-hint">Format local, sans indicatif pays.</p>
-          </div>
+            <div class="field">
+              <label for="sender-name">Votre nom</label>
+              <input type="text" id="sender-name" name="senderName" placeholder="Ex : Jean Dupont" required />
+            </div>
 
-          <div class="field">
-            <label for="amount">Montant à envoyer <span id="currency-tag" class="currency-tag"></span></label>
-            <input type="number" id="amount" name="amount" min="1" step="1" placeholder="5000" required />
-          </div>
+            <div class="field">
+              <label for="sender-phone">Votre numéro Mobile Money</label>
+              <div class="phone-input">
+                <span class="phone-input__prefix" id="sender-dial-code">+—</span>
+                <input type="tel" id="sender-phone" name="senderPhone" placeholder="Numéro sur lequel vous payez" required />
+              </div>
+              <p class="hint" id="sender-phone-hint">Sélectionnez d'abord votre pays.</p>
+            </div>
 
-          <button type="submit" id="submit-btn">
-            <span class="btn__label">Payer et envoyer</span>
-          </button>
+            <div class="field">
+              <label id="sender-network-label">Votre réseau (facultatif)</label>
+              <div class="network-grid" id="sender-network-grid" role="radiogroup" aria-labelledby="sender-network-label">
+                <p class="hint">Sélectionnez d'abord un pays.</p>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Étape 2 : pays destinataire -->
+          <fieldset class="wizard-step" data-substep="2">
+            <h2 class="step-title">Vers quel pays ?</h2>
+            <p class="step-sub">Choisissez le pays du destinataire.</p>
+
+            <div class="field">
+              <label for="country">Pays destinataire</label>
+              <select id="country" name="country" required disabled>
+                <option value="">Chargement des pays…</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <!-- Étape 3 : réseau + numéro destinataire -->
+          <fieldset class="wizard-step" data-substep="3">
+            <h2 class="step-title">Réseau &amp; numéro</h2>
+            <p class="step-sub">Quel réseau et quel numéro reçoivent l'argent ?</p>
+
+            <div class="field">
+              <label id="network-label">Réseau à créditer</label>
+              <div class="network-grid" id="network-grid" role="radiogroup" aria-labelledby="network-label">
+                <p class="hint">Sélectionnez d'abord un pays.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="phone">Numéro du destinataire</label>
+              <div class="phone-input">
+                <span class="phone-input__prefix" id="recipient-dial-code">+—</span>
+                <input type="tel" id="phone" name="phone" placeholder="Ex : 0102030405" required />
+              </div>
+              <p class="hint" id="phone-hint">Format local, sans indicatif pays.</p>
+            </div>
+          </fieldset>
+
+          <!-- Étape 4 : montant -->
+          <fieldset class="wizard-step" data-substep="4">
+            <h2 class="step-title">Montant</h2>
+            <p class="step-sub">Combien voulez-vous envoyer ?</p>
+
+            <div class="field">
+              <label for="amount">Montant à envoyer <span id="currency-tag" class="currency-tag"></span></label>
+              <input type="number" id="amount" name="amount" min="1" step="1" placeholder="5000" required />
+              <p class="hint">Le destinataire reçoit exactement ce montant. Des frais Mobile Money peuvent s'appliquer côté paiement.</p>
+            </div>
+          </fieldset>
+
+          <!-- Étape 5 : vérification -->
+          <fieldset class="wizard-step" data-substep="5">
+            <h2 class="step-title">Vérifiez et envoyez</h2>
+            <p class="step-sub">Un dernier coup d'œil avant l'envoi.</p>
+
+            <dl class="review">
+              <div><dt>Type</dt><dd id="review-type">—</dd></div>
+              <div><dt>Votre numéro</dt><dd id="review-sender">—</dd></div>
+              <div><dt>Destinataire</dt><dd id="review-recipient">—</dd></div>
+              <div><dt>Réseau destinataire</dt><dd id="review-network">—</dd></div>
+              <div><dt>Vous envoyez</dt><dd id="review-amount">—</dd></div>
+              <div class="review__highlight"><dt>Le destinataire reçoit</dt><dd id="review-received">—</dd></div>
+            </dl>
+          </fieldset>
 
           <p class="error" id="form-error" role="alert"></p>
+
+          <div class="wizard-nav">
+            <button type="button" class="btn-secondary" id="back-btn">Retour</button>
+            <button type="button" class="btn-primary" id="next-btn">Continuer</button>
+            <button type="submit" class="btn-primary is-hidden" id="submit-btn">
+              <span class="btn__label">Payer et envoyer</span>
+            </button>
+          </div>
         </form>
       </section>
 
-      <!-- ÉTAPE 2/3 : suivi -->
+      <!-- ===================== SUIVI DU TRANSFERT ===================== -->
       <section class="panel is-hidden" id="panel-status">
         <div class="status" id="status-visual">
           <div class="status__ring" id="status-ring">
             <div class="status__icon" id="status-icon">↻</div>
           </div>
           <p class="status__title" id="status-title">Transfert en cours…</p>
-          <p class="status__message" id="status-message">Nous attendons la confirmation de FusionMoney.</p>
+          <p class="status__message" id="status-message">Nous attendons la confirmation du paiement.</p>
         </div>
 
         <dl class="summary" id="summary">
@@ -108,7 +169,7 @@
 
     </main>
 
-    <p class="foot-note">Propulsé par les API Payin &amp; Payout de FusionMoney (MoneyFusion).</p>
+    <p class="foot-note">Kouamé Paiement — transferts sécurisés entre réseaux Mobile Money.</p>
   </div>
 
   <script src="app.js"></script>

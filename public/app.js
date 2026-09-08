@@ -1,19 +1,30 @@
 // app.js
+// Assistant en 5 étapes : (1) expéditeur, (2) pays destinataire,
+// (3) réseau + numéro destinataire, (4) montant, (5) vérification & envoi.
 // Charge dynamiquement la liste des pays/réseaux depuis /api/methods, gère
-// la soumission du formulaire, puis suit (polling) l'état du transfert
+// la navigation entre étapes, puis suit (polling) l'état du transfert
 // jusqu'à confirmation. N'appelle jamais FusionMoney directement : passe
 // toujours par notre backend, qui seul détient la clé API.
 
+const senderCountrySelect = document.getElementById('sender-country');
+const senderDialCode = document.getElementById('sender-dial-code');
 const senderNameInput = document.getElementById('sender-name');
 const senderPhoneInput = document.getElementById('sender-phone');
+const senderPhoneHint = document.getElementById('sender-phone-hint');
+const senderNetworkGrid = document.getElementById('sender-network-grid');
+
 const countrySelect = document.getElementById('country');
+const recipientDialCode = document.getElementById('recipient-dial-code');
 const networkGrid = document.getElementById('network-grid');
 const phoneInput = document.getElementById('phone');
 const phoneHint = document.getElementById('phone-hint');
 const amountInput = document.getElementById('amount');
 const currencyTag = document.getElementById('currency-tag');
+
 const form = document.getElementById('transfer-form');
 const submitBtn = document.getElementById('submit-btn');
+const nextBtn = document.getElementById('next-btn');
+const backBtn = document.getElementById('back-btn');
 const formError = document.getElementById('form-error');
 
 const panelForm = document.getElementById('panel-form');
@@ -29,13 +40,21 @@ const summaryNetwork = document.getElementById('summary-network');
 const summaryAmount = document.getElementById('summary-amount');
 const summaryToken = document.getElementById('summary-token');
 
-const stepItems = {
-  form: document.querySelector('.steps__item[data-step="form"]'),
-  pending: document.querySelector('.steps__item[data-step="pending"]'),
-  done: document.querySelector('.steps__item[data-step="done"]'),
-};
+const reviewType = document.getElementById('review-type');
+const reviewSender = document.getElementById('review-sender');
+const reviewRecipient = document.getElementById('review-recipient');
+const reviewNetwork = document.getElementById('review-network');
+const reviewAmount = document.getElementById('review-amount');
+const reviewReceived = document.getElementById('review-received');
+
+const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
+const dots = Array.from(document.querySelectorAll('.dots__item'));
+const TOTAL_STEPS = wizardSteps.length;
+let currentStep = 1;
 
 let countriesData = [];
+let selectedSenderCountry = null;
+let selectedSenderMethod = null; // facultatif, juste pour l'affichage
 let selectedCountry = null;
 let selectedMethod = null; // { key, name }
 
@@ -62,21 +81,108 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function setStep(step, variant) {
-  Object.values(stepItems).forEach((el) => el.classList.remove('is-active', 'is-done', 'is-failed'));
-  if (step === 'form') {
-    stepItems.form.classList.add('is-active');
-  } else if (step === 'pending') {
-    stepItems.form.classList.add('is-done');
-    stepItems.pending.classList.add('is-active');
-  } else if (step === 'done') {
-    stepItems.form.classList.add('is-done');
-    stepItems.pending.classList.add(variant === 'failed' ? 'is-failed' : 'is-done');
-    stepItems.done.classList.add(variant === 'failed' ? 'is-failed' : 'is-done');
-  }
+// --- Navigation entre les 5 étapes de l'assistant -----------------------
+
+function renderDots() {
+  dots.forEach((dot, index) => {
+    const stepNumber = index + 1;
+    dot.classList.remove('is-active', 'is-done');
+    if (stepNumber < currentStep) dot.classList.add('is-done');
+    else if (stepNumber === currentStep) dot.classList.add('is-active');
+  });
 }
 
-// --- Chargement des pays / réseaux disponibles -------------------------
+function showStep(step) {
+  currentStep = step;
+  wizardSteps.forEach((el) => {
+    el.classList.toggle('is-active', Number(el.dataset.substep) === step);
+  });
+  renderDots();
+  formError.textContent = '';
+
+  backBtn.disabled = step === 1;
+  const isLastStep = step === TOTAL_STEPS;
+  nextBtn.classList.toggle('is-hidden', isLastStep);
+  submitBtn.classList.toggle('is-hidden', !isLastStep);
+  if (isLastStep) fillReview();
+}
+
+function validateStep(step) {
+  if (step === 1) {
+    if (!selectedSenderCountry) return 'Veuillez choisir votre pays.';
+    if (!senderNameInput.value.trim()) return 'Veuillez saisir votre nom.';
+    const digits = senderPhoneInput.value.trim().replace(/\D/g, '');
+    const rule = selectedSenderCountry.phoneRule;
+    if (!digits) return 'Veuillez saisir votre numéro Mobile Money.';
+    if (rule && digits.length !== rule.digits) {
+      return `Numéro invalide : ${rule.digits} chiffres attendus (ex : ${rule.example}).`;
+    }
+    if (!rule && (digits.length < 6 || digits.length > 12)) {
+      return 'Veuillez saisir un numéro de téléphone valide.';
+    }
+    return null;
+  }
+  if (step === 2) {
+    if (!selectedCountry) return 'Veuillez choisir le pays du destinataire.';
+    return null;
+  }
+  if (step === 3) {
+    if (!selectedMethod) return 'Veuillez choisir un réseau.';
+    const digits = phoneInput.value.trim().replace(/\D/g, '');
+    const rule = selectedCountry.phoneRule;
+    if (!digits) return 'Veuillez saisir le numéro du destinataire.';
+    if (rule && digits.length !== rule.digits) {
+      return `Numéro invalide : ${rule.digits} chiffres attendus pour ${selectedCountry.country} (ex : ${rule.example}).`;
+    }
+    if (!rule && (digits.length < 6 || digits.length > 12)) {
+      return 'Veuillez saisir un numéro de téléphone valide.';
+    }
+    return null;
+  }
+  if (step === 4) {
+    const amount = amountInput.value.trim();
+    if (!amount || Number(amount) <= 0) return 'Veuillez saisir un montant valide.';
+    return null;
+  }
+  return null;
+}
+
+function fillReview() {
+  const senderDigits = senderPhoneInput.value.trim().replace(/\D/g, '');
+  const recipientDigits = phoneInput.value.trim().replace(/\D/g, '');
+  const senderDial = selectedSenderCountry?.phoneRule?.dialCode;
+  const recipientDial = selectedCountry?.phoneRule?.dialCode;
+
+  reviewType.textContent = selectedSenderCountry && selectedCountry
+    ? (selectedSenderCountry.code === selectedCountry.code
+      ? `National — ${selectedCountry.country}`
+      : `International — ${selectedSenderCountry.country} → ${selectedCountry.country}`)
+    : '—';
+  reviewSender.textContent = `${senderDial ? '+' + senderDial + ' ' : ''}${senderDigits}${selectedSenderMethod ? ' · ' + selectedSenderMethod.name : ''}`;
+  reviewRecipient.textContent = `${recipientDial ? '+' + recipientDial + ' ' : ''}${recipientDigits}`;
+  reviewNetwork.textContent = selectedMethod ? selectedMethod.name : '—';
+  const amount = amountInput.value.trim();
+  const currency = selectedCountry ? selectedCountry.currency : '';
+  reviewAmount.textContent = amount ? `${amount} ${currency}`.trim() : '—';
+  reviewReceived.textContent = amount ? `${amount} ${currency}`.trim() : '—';
+}
+
+nextBtn.addEventListener('click', () => {
+  const error = validateStep(currentStep);
+  if (error) {
+    formError.textContent = error;
+    return;
+  }
+  if (currentStep < TOTAL_STEPS) showStep(currentStep + 1);
+});
+
+backBtn.addEventListener('click', () => {
+  if (currentStep > 1) showStep(currentStep - 1);
+});
+
+// --- Chargement des pays / réseaux disponibles ---------------------------
+// La même liste (pays + réseaux pris en charge côté envoi/retrait) sert à
+// la fois pour l'expéditeur et pour le destinataire.
 
 async function loadMethods() {
   try {
@@ -88,26 +194,27 @@ async function loadMethods() {
     }
 
     countriesData = data.data;
-    countrySelect.innerHTML = '<option value="">Sélectionnez un pays</option>' +
-      countriesData
-        .map((c) => `<option value="${c.code}">${c.country}</option>`)
-        .join('');
+    const options = '<option value="">Sélectionnez un pays</option>' +
+      countriesData.map((c) => `<option value="${c.code}">${c.country}</option>`).join('');
+
+    senderCountrySelect.innerHTML = options;
+    senderCountrySelect.disabled = false;
+    countrySelect.innerHTML = options;
     countrySelect.disabled = false;
   } catch (err) {
-    countrySelect.innerHTML = '<option value="">Réseaux indisponibles pour le moment</option>';
-    formError.textContent = "Impossible de charger la liste des pays. Réessayez dans un instant.";
+    senderCountrySelect.innerHTML = '<option value="">Pays indisponibles pour le moment</option>';
+    countrySelect.innerHTML = '<option value="">Pays indisponibles pour le moment</option>';
+    formError.textContent = 'Impossible de charger la liste des pays. Réessayez dans un instant.';
   }
 }
 
-function renderNetworkChips(country) {
-  selectedMethod = null;
-
+function renderNetworkChips(grid, country, onSelect) {
   if (!country || !(country.paymentMethods || []).length) {
-    networkGrid.innerHTML = '<p class="hint">Sélectionnez d\'abord un pays.</p>';
+    grid.innerHTML = '<p class="hint">Sélectionnez d\'abord un pays.</p>';
     return;
   }
 
-  networkGrid.innerHTML = '';
+  grid.innerHTML = '';
   country.paymentMethods.forEach((method) => {
     const color = operatorColor(method.name);
     const chip = document.createElement('button');
@@ -120,35 +227,43 @@ function renderNetworkChips(country) {
       <span class="network-chip__badge" style="background:${color.bg};color:${color.fg}">${method.name.charAt(0).toUpperCase()}</span>
       <span class="network-chip__name">${method.name}</span>
     `;
-    chip.addEventListener('click', () => selectNetwork(method, chip));
-    networkGrid.appendChild(chip);
+    chip.addEventListener('click', () => {
+      grid.querySelectorAll('.network-chip').forEach((el) => {
+        el.classList.remove('is-selected');
+        el.setAttribute('aria-checked', 'false');
+      });
+      chip.classList.add('is-selected');
+      chip.setAttribute('aria-checked', 'true');
+      onSelect(method);
+    });
+    grid.appendChild(chip);
   });
 }
 
-function selectNetwork(method, chipEl) {
-  selectedMethod = method;
-  networkGrid.querySelectorAll('.network-chip').forEach((el) => {
-    el.classList.remove('is-selected');
-    el.setAttribute('aria-checked', 'false');
-  });
-  chipEl.classList.add('is-selected');
-  chipEl.setAttribute('aria-checked', 'true');
-}
-
-function updatePhoneHint(country) {
+function updatePhoneHint(hintEl, country) {
   const rule = country && country.phoneRule;
   if (rule) {
-    phoneHint.textContent = `${rule.digits} chiffres attendus pour ${country.country}, ex : ${rule.example}.`;
+    hintEl.textContent = `${rule.digits} chiffres attendus pour ${country.country}, ex : ${rule.example}.`;
   } else {
-    phoneHint.textContent = 'Format local, sans indicatif pays.';
+    hintEl.textContent = 'Format local, sans indicatif pays.';
   }
 }
 
+senderCountrySelect.addEventListener('change', () => {
+  selectedSenderCountry = countriesData.find((c) => c.code === senderCountrySelect.value) || null;
+  selectedSenderMethod = null;
+  renderNetworkChips(senderNetworkGrid, selectedSenderCountry, (method) => { selectedSenderMethod = method; });
+  updatePhoneHint(senderPhoneHint, selectedSenderCountry);
+  senderDialCode.textContent = selectedSenderCountry?.phoneRule?.dialCode ? `+${selectedSenderCountry.phoneRule.dialCode}` : '+—';
+});
+
 countrySelect.addEventListener('change', () => {
   selectedCountry = countriesData.find((c) => c.code === countrySelect.value) || null;
-  renderNetworkChips(selectedCountry);
-  updatePhoneHint(selectedCountry);
+  selectedMethod = null;
+  renderNetworkChips(networkGrid, selectedCountry, (method) => { selectedMethod = method; });
+  updatePhoneHint(phoneHint, selectedCountry);
   currencyTag.textContent = selectedCountry ? `(${selectedCountry.currency})` : '';
+  recipientDialCode.textContent = selectedCountry?.phoneRule?.dialCode ? `+${selectedCountry.phoneRule.dialCode}` : '+—';
 });
 
 // --- Suivi du transfert --------------------------------------------------
@@ -165,19 +280,18 @@ function showStatusPanel() {
 //   completed      -> destinataire crédité (fin, succès)
 //   payout_failed  -> paiement reçu MAIS envoi au destinataire échoué (fin, échec — cas à surveiller)
 const STAGE_LABELS = {
-  payin_pending: { title: 'En attente du paiement…', spinning: true },
-  payout_pending: { title: 'Envoi au destinataire…', spinning: true },
-  completed: { title: 'Transfert réussi', success: true },
-  payin_failed: { title: 'Paiement refusé', success: false },
-  payout_failed: { title: "Échec de l'envoi", success: false },
+  payin_pending: { title: 'En attente du paiement…' },
+  payout_pending: { title: 'Envoi au destinataire…' },
+  completed: { title: 'Transfert réussi' },
+  payin_failed: { title: 'Paiement refusé' },
+  payout_failed: { title: "Échec de l'envoi" },
 };
 
 function renderPending(stage, message) {
   statusRing.className = 'status__ring is-spinning';
   statusIcon.textContent = '↻';
   statusTitle.textContent = (STAGE_LABELS[stage] && STAGE_LABELS[stage].title) || 'Transfert en cours…';
-  statusMessage.textContent = message || 'Nous attendons la confirmation de FusionMoney. Cela ne prend généralement que quelques instants.';
-  setStep('pending');
+  statusMessage.textContent = message || 'Nous attendons la confirmation du paiement. Cela ne prend généralement que quelques instants.';
   newTransferBtn.classList.add('is-hidden');
 }
 
@@ -187,7 +301,6 @@ function renderResult(stage, message) {
   statusIcon.textContent = isSuccess ? '✓' : '✕';
   statusTitle.textContent = (STAGE_LABELS[stage] && STAGE_LABELS[stage].title) || (isSuccess ? 'Transfert réussi' : 'Transfert échoué');
   statusMessage.textContent = message;
-  setStep('done', isSuccess ? 'success' : 'failed');
   newTransferBtn.classList.remove('is-hidden');
 }
 
@@ -229,53 +342,25 @@ async function pollTransfer(transferId, { intervalMs = 3000, timeoutMs = 300000 
   return 'timeout';
 }
 
-// --- Soumission du formulaire --------------------------------------------
+// --- Soumission du formulaire (étape 5) -----------------------------------
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   formError.textContent = '';
 
+  for (let step = 1; step <= 4; step += 1) {
+    const error = validateStep(step);
+    if (error) {
+      showStep(step);
+      formError.textContent = error;
+      return;
+    }
+  }
+
   const senderName = senderNameInput.value.trim();
-  const senderPhone = senderPhoneInput.value.trim();
-  const phone = phoneInput.value.trim();
-  const digitsOnly = phone.replace(/\D/g, '');
+  const senderPhone = senderPhoneInput.value.trim().replace(/\D/g, '');
+  const phone = phoneInput.value.trim().replace(/\D/g, '');
   const amount = amountInput.value.trim();
-
-  if (!senderName) {
-    formError.textContent = 'Veuillez saisir votre nom.';
-    return;
-  }
-  if (!senderPhone || senderPhone.replace(/\D/g, '').length < 6) {
-    formError.textContent = 'Veuillez saisir votre numéro Mobile Money.';
-    return;
-  }
-  if (!selectedCountry) {
-    formError.textContent = 'Veuillez choisir un pays.';
-    return;
-  }
-  if (!selectedMethod) {
-    formError.textContent = 'Veuillez choisir un réseau.';
-    return;
-  }
-  if (!phone) {
-    formError.textContent = 'Veuillez saisir le numéro du destinataire.';
-    return;
-  }
-
-  const rule = selectedCountry.phoneRule;
-  if (rule && digitsOnly.length !== rule.digits) {
-    formError.textContent = `Numéro invalide : ${rule.digits} chiffres attendus pour ${selectedCountry.country} (ex : ${rule.example}).`;
-    return;
-  }
-  if (!rule && (digitsOnly.length < 6 || digitsOnly.length > 12)) {
-    formError.textContent = 'Veuillez saisir un numéro de téléphone valide.';
-    return;
-  }
-
-  if (!amount || Number(amount) <= 0) {
-    formError.textContent = 'Veuillez saisir un montant valide.';
-    return;
-  }
 
   submitBtn.disabled = true;
   submitBtn.querySelector('.btn__label').textContent = 'Préparation du paiement…';
@@ -286,10 +371,11 @@ form.addEventListener('submit', async (event) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         senderName,
-        senderPhone: senderPhone.replace(/\D/g, ''),
+        senderPhone,
+        senderCountryCode: selectedSenderCountry ? selectedSenderCountry.code : null,
         countryCode: selectedCountry.code,
         withdrawMode: selectedMethod.key,
-        phone: digitsOnly,
+        phone,
         amount,
       }),
     });
@@ -298,6 +384,8 @@ form.addEventListener('submit', async (event) => {
 
     if (!response.ok || !data.success) {
       formError.textContent = data.message || 'La création du transfert a échoué.';
+      submitBtn.disabled = false;
+      submitBtn.querySelector('.btn__label').textContent = 'Payer et envoyer';
       return;
     }
 
@@ -314,14 +402,20 @@ form.addEventListener('submit', async (event) => {
 
 newTransferBtn.addEventListener('click', () => {
   form.reset();
+  selectedSenderCountry = null;
+  selectedSenderMethod = null;
   selectedCountry = null;
   selectedMethod = null;
-  renderNetworkChips(null);
-  updatePhoneHint(null);
+  renderNetworkChips(senderNetworkGrid, null, () => {});
+  renderNetworkChips(networkGrid, null, () => {});
+  updatePhoneHint(senderPhoneHint, null);
+  updatePhoneHint(phoneHint, null);
+  senderDialCode.textContent = '+—';
+  recipientDialCode.textContent = '+—';
   currencyTag.textContent = '';
   panelStatus.classList.add('is-hidden');
   panelForm.classList.remove('is-hidden');
-  setStep('form');
+  showStep(1);
 });
 
 // --- Reprise du suivi au retour de la page de paiement FusionMoney ------
@@ -344,5 +438,6 @@ function resumeTransferFromUrl() {
   return true;
 }
 
+showStep(1);
 resumeTransferFromUrl();
 loadMethods();
