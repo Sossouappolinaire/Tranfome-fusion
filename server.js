@@ -106,7 +106,7 @@ app.get('/api/methods', async (req, res) => {
 
 // --- Étape 1 : créer le transfert et lancer le PAYIN chez l'expéditeur --
 app.post('/api/transfer', async (req, res) => {
-  const { senderPhone, senderName, countryCode, withdrawMode, phone, amount } = req.body;
+  const { senderPhone, senderName, senderCountryCode, countryCode, withdrawMode, phone, amount } = req.body;
 
   if (!senderPhone || !senderName) {
     return res.status(400).json({ success: false, message: 'senderPhone et senderName sont requis.' });
@@ -144,7 +144,14 @@ app.post('/api/transfer', async (req, res) => {
     }
 
     const senderDigitsOnly = String(senderPhone).replace(/\D/g, '');
-    if (senderDigitsOnly.length < 6 || senderDigitsOnly.length > 12) {
+    const senderRule = senderCountryCode ? getPhoneRule(senderCountryCode) : null;
+    if (senderRule && senderDigitsOnly.length !== senderRule.digits) {
+      return res.status(400).json({
+        success: false,
+        message: `Numéro invalide pour l'expéditeur : ${senderRule.digits} chiffres attendus (ex : ${senderRule.example}).`,
+      });
+    }
+    if (!senderRule && (senderDigitsOnly.length < 6 || senderDigitsOnly.length > 12)) {
       return res.status(400).json({ success: false, message: 'Numéro de téléphone (expéditeur) invalide.' });
     }
 
@@ -154,7 +161,7 @@ app.post('/api/transfer', async (req, res) => {
       transferId,
       stage: 'payin_pending', // payin_pending -> payin_failed | payout_pending -> completed | payout_failed
       message: 'En attente du paiement de l\'expéditeur.',
-      sender: { phone: senderDigitsOnly, name: senderName },
+      sender: { phone: senderDigitsOnly, name: senderName, countryCode: senderCountryCode || null },
       recipient: {
         countryCode,
         countryName: match.country.country,

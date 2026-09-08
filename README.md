@@ -1,4 +1,4 @@
-# Fusion Transfert
+# Kouamé Paiement — Réseau vers autre
 
 Application Node.js/Express qui permet un **vrai transfert réseau → réseau** :
 on encaisse l'argent chez l'expéditeur (PAYIN), puis on l'envoie
