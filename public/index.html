@@ -123,30 +123,80 @@
             </div>
           </fieldset>
 
-          <!-- Étape 5 : vérification -->
-          <fieldset class="wizard-step" data-substep="5">
-            <h2 class="step-title">Vérifiez et envoyez</h2>
-            <p class="step-sub">Un dernier coup d'œil avant l'envoi.</p>
+          <!-- Étape 5 : récapitulatif -->
+          <fieldset class="wizard-step review-step" data-substep="5">
 
-            <div class="fields-sheet">
-              <dl class="review">
-                <div><dt>Type</dt><dd id="review-type">—</dd></div>
-                <div><dt>Votre numéro</dt><dd id="review-sender">—</dd></div>
-                <div><dt>Destinataire</dt><dd id="review-recipient">—</dd></div>
-                <div><dt>Réseau destinataire</dt><dd id="review-network">—</dd></div>
-                <div><dt>Vous envoyez</dt><dd id="review-amount">—</dd></div>
-                <div class="review__highlight"><dt>Le destinataire reçoit</dt><dd id="review-received">—</dd></div>
-              </dl>
+            <div class="recap-header">
+              <button type="button" class="recap-back" id="recap-back-btn" aria-label="Retour à l'étape précédente">←</button>
+              <span class="recap-network-badge" id="recap-network-badge">—</span>
+              <h2 class="recap-title">Récapitulatif de transfert</h2>
+              <p class="recap-sub">Votre transfert a été préparé avec succès. Vérifiez les informations ci-dessous.</p>
+            </div>
+
+            <div class="recap-ready">
+              <span class="recap-ready__icon">✓</span>
+              <div>
+                <p class="recap-ready__title">Transfert prêt !</p>
+                <p class="recap-ready__sub">Envoyez maintenant votre argent en toute sécurité.</p>
+              </div>
+            </div>
+
+            <div class="recap-card">
+              <div class="recap-card__head">
+                <span class="recap-card__icon">👤</span>
+                <div class="recap-card__head-text">
+                  <p class="recap-card__type" id="review-type">—</p>
+                  <p class="recap-card__subtype">Transfert Mobile Money</p>
+                </div>
+                <span class="recap-card__network" id="review-network-badge">—</span>
+              </div>
+
+              <div class="recap-row">
+                <span class="recap-row__icon recap-row__icon--phone">📱</span>
+                <span class="recap-row__label">Votre numéro</span>
+                <span class="recap-row__value">
+                  <strong id="review-sender">—</strong>
+                  <small id="review-sender-network"></small>
+                </span>
+              </div>
+              <div class="recap-row">
+                <span class="recap-row__icon recap-row__icon--person">🧑</span>
+                <span class="recap-row__label">Destinataire</span>
+                <span class="recap-row__value">
+                  <strong id="review-recipient">—</strong>
+                  <small id="review-recipient-network"></small>
+                </span>
+              </div>
+              <div class="recap-row">
+                <span class="recap-row__icon recap-row__icon--network">📡</span>
+                <span class="recap-row__label">Réseau destinataire</span>
+                <span class="recap-row__value"><strong id="review-network">—</strong></span>
+              </div>
+              <div class="recap-row">
+                <span class="recap-row__icon recap-row__icon--send">📤</span>
+                <span class="recap-row__label">Vous envoyez</span>
+                <span class="recap-row__value"><strong id="review-amount">—</strong></span>
+              </div>
+              <div class="recap-row">
+                <span class="recap-row__icon recap-row__icon--doc">📄</span>
+                <span class="recap-row__label">Le destinataire reçoit</span>
+                <span class="recap-row__value"><span class="recap-pill" id="review-received">—</span></span>
+              </div>
+            </div>
+
+            <div class="recap-info">
+              <span class="recap-info__icon">🛡️</span>
+              <p id="review-explanation">—</p>
             </div>
           </fieldset>
 
           <p class="error" id="form-error" role="alert"></p>
 
           <div class="wizard-nav">
-            <button type="button" class="btn-secondary" id="back-btn">Retour</button>
-            <button type="button" class="btn-primary" id="next-btn">Continuer</button>
+            <button type="button" class="btn-secondary" id="back-btn">← Retour</button>
+            <button type="button" class="btn-primary" id="next-btn">Continuer →</button>
             <button type="submit" class="btn-primary is-hidden" id="submit-btn">
-              <span class="btn__label">Payer et envoyer</span>
+              <span class="btn__label">✈️ Payer et envoyer</span>
             </button>
           </div>
         </form>

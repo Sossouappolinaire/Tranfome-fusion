@@ -42,10 +42,16 @@ const summaryToken = document.getElementById('summary-token');
 
 const reviewType = document.getElementById('review-type');
 const reviewSender = document.getElementById('review-sender');
+const reviewSenderNetwork = document.getElementById('review-sender-network');
 const reviewRecipient = document.getElementById('review-recipient');
+const reviewRecipientNetwork = document.getElementById('review-recipient-network');
 const reviewNetwork = document.getElementById('review-network');
 const reviewAmount = document.getElementById('review-amount');
 const reviewReceived = document.getElementById('review-received');
+const reviewExplanation = document.getElementById('review-explanation');
+const recapNetworkBadge = document.getElementById('recap-network-badge');
+const reviewNetworkBadge = document.getElementById('review-network-badge');
+const recapBackBtn = document.getElementById('recap-back-btn');
 
 const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
 const dots = Array.from(document.querySelectorAll('.dots__item'));
@@ -152,19 +158,38 @@ function fillReview() {
   const recipientDigits = phoneInput.value.trim().replace(/\D/g, '');
   const senderDial = selectedSenderCountry?.phoneRule?.dialCode;
   const recipientDial = selectedCountry?.phoneRule?.dialCode;
+  const senderFull = `${senderDial ? '+' + senderDial + ' ' : ''}${senderDigits}`;
+  const recipientFull = `${recipientDial ? '+' + recipientDial + ' ' : ''}${recipientDigits}`;
+  const isNational = selectedSenderCountry && selectedCountry && selectedSenderCountry.code === selectedCountry.code;
 
   reviewType.textContent = selectedSenderCountry && selectedCountry
-    ? (selectedSenderCountry.code === selectedCountry.code
+    ? (isNational
       ? `National — ${selectedCountry.country}`
       : `International — ${selectedSenderCountry.country} → ${selectedCountry.country}`)
     : '—';
-  reviewSender.textContent = `${senderDial ? '+' + senderDial + ' ' : ''}${senderDigits}${selectedSenderMethod ? ' · ' + selectedSenderMethod.name : ''}`;
-  reviewRecipient.textContent = `${recipientDial ? '+' + recipientDial + ' ' : ''}${recipientDigits}`;
+
+  reviewSender.textContent = senderFull;
+  reviewSenderNetwork.textContent = selectedSenderMethod ? selectedSenderMethod.name : '';
+
+  reviewRecipient.textContent = recipientFull;
+  reviewRecipientNetwork.textContent = selectedMethod ? selectedMethod.name : '';
+
   reviewNetwork.textContent = selectedMethod ? selectedMethod.name : '—';
+
   const amount = amountInput.value.trim();
   const currency = selectedCountry ? selectedCountry.currency : '';
-  reviewAmount.textContent = amount ? `${amount} ${currency}`.trim() : '—';
-  reviewReceived.textContent = amount ? `${amount} ${currency}`.trim() : '—';
+  const amountLabel = amount ? `${amount} ${currency}`.trim() : '—';
+  reviewAmount.textContent = amountLabel;
+  reviewReceived.textContent = amountLabel;
+
+  const recipientNetworkName = selectedMethod ? selectedMethod.name : 'du réseau choisi';
+  recapNetworkBadge.textContent = selectedMethod ? selectedMethod.name : '—';
+  reviewNetworkBadge.textContent = selectedMethod ? selectedMethod.name : '—';
+
+  // Explication claire, en toutes lettres, de qui paie et qui reçoit.
+  reviewExplanation.textContent = amount
+    ? `${amountLabel} seront prélevés de votre numéro ${senderFull}${selectedSenderMethod ? ' (' + selectedSenderMethod.name + ')' : ''} et envoyés au numéro ${recipientFull} sur le réseau ${recipientNetworkName}.`
+    : 'Renseignez le montant pour voir le détail du transfert.';
 }
 
 nextBtn.addEventListener('click', () => {
@@ -177,6 +202,10 @@ nextBtn.addEventListener('click', () => {
 });
 
 backBtn.addEventListener('click', () => {
+  if (currentStep > 1) showStep(currentStep - 1);
+});
+
+recapBackBtn.addEventListener('click', () => {
   if (currentStep > 1) showStep(currentStep - 1);
 });
 
