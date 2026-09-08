@@ -1,0 +1,16 @@
+{
+  "name": "fusionpay-transfert",
+  "version": "1.0.0",
+  "description": "Transfert d'argent Mobile Money vers un autre réseau, dans tous les pays pris en charge par l'API Payout de FusionMoney (MoneyFusion)",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
+  }
+}
