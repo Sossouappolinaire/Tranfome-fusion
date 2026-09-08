@@ -7,23 +7,18 @@
   <meta name="description" content="Transférez de l'argent Mobile Money d'un réseau vers un autre, dans n'importe quel pays pris en charge." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <div class="scene">
-    <div class="scene__glow"></div>
 
     <main class="card" id="card">
 
       <div class="brand">
-        <span class="brand__mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <span class="brand__name">Kouamé Paiement</span>
+        <span class="brand__name">Kouamé<strong>Paiement</strong></span>
+        <span class="brand__badge" aria-hidden="true">?</span>
       </div>
 
       <!-- ===================== ÉTAPE(S) FORMULAIRE (assistant 5 étapes) ===================== -->
@@ -44,31 +39,33 @@
             <h2 class="step-title">Vous êtes l'expéditeur</h2>
             <p class="step-sub">D'où envoyez-vous l'argent ?</p>
 
-            <div class="field">
-              <label for="sender-country">Pays expéditeur</label>
-              <select id="sender-country" name="senderCountry" required disabled>
-                <option value="">Chargement des pays…</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="sender-name">Votre nom</label>
-              <input type="text" id="sender-name" name="senderName" placeholder="Ex : Jean Dupont" required />
-            </div>
-
-            <div class="field">
-              <label for="sender-phone">Votre numéro Mobile Money</label>
-              <div class="phone-input">
-                <span class="phone-input__prefix" id="sender-dial-code">+—</span>
-                <input type="tel" id="sender-phone" name="senderPhone" placeholder="Numéro sur lequel vous payez" required />
+            <div class="fields-sheet">
+              <div class="field">
+                <label for="sender-country">Pays expéditeur</label>
+                <select id="sender-country" name="senderCountry" required disabled>
+                  <option value="">Chargement des pays…</option>
+                </select>
               </div>
-              <p class="hint" id="sender-phone-hint">Sélectionnez d'abord votre pays.</p>
-            </div>
 
-            <div class="field">
-              <label id="sender-network-label">Votre réseau (facultatif)</label>
-              <div class="network-grid" id="sender-network-grid" role="radiogroup" aria-labelledby="sender-network-label">
-                <p class="hint">Sélectionnez d'abord un pays.</p>
+              <div class="field">
+                <label for="sender-name">Votre nom</label>
+                <input type="text" id="sender-name" name="senderName" placeholder="Ex : Jean Dupont" required />
+              </div>
+
+              <div class="field">
+                <label for="sender-phone">Votre numéro Mobile Money</label>
+                <div class="phone-input">
+                  <span class="phone-input__prefix" id="sender-dial-code">+—</span>
+                  <input type="tel" id="sender-phone" name="senderPhone" placeholder="Numéro sur lequel vous payez" required />
+                </div>
+                <p class="hint" id="sender-phone-hint">Sélectionnez d'abord votre pays.</p>
+              </div>
+
+              <div class="field">
+                <label id="sender-network-label">Votre réseau (facultatif)</label>
+                <div class="network-grid" id="sender-network-grid" role="radiogroup" aria-labelledby="sender-network-label">
+                  <p class="hint">Sélectionnez d'abord un pays.</p>
+                </div>
               </div>
             </div>
           </fieldset>
@@ -78,11 +75,13 @@
             <h2 class="step-title">Vers quel pays ?</h2>
             <p class="step-sub">Choisissez le pays du destinataire.</p>
 
-            <div class="field">
-              <label for="country">Pays destinataire</label>
-              <select id="country" name="country" required disabled>
-                <option value="">Chargement des pays…</option>
-              </select>
+            <div class="fields-sheet">
+              <div class="field">
+                <label for="country">Pays destinataire</label>
+                <select id="country" name="country" required disabled>
+                  <option value="">Chargement des pays…</option>
+                </select>
+              </div>
             </div>
           </fieldset>
 
@@ -91,20 +90,22 @@
             <h2 class="step-title">Réseau &amp; numéro</h2>
             <p class="step-sub">Quel réseau et quel numéro reçoivent l'argent ?</p>
 
-            <div class="field">
-              <label id="network-label">Réseau à créditer</label>
-              <div class="network-grid" id="network-grid" role="radiogroup" aria-labelledby="network-label">
-                <p class="hint">Sélectionnez d'abord un pays.</p>
+            <div class="fields-sheet">
+              <div class="field">
+                <label id="network-label">Réseau à créditer</label>
+                <div class="network-grid" id="network-grid" role="radiogroup" aria-labelledby="network-label">
+                  <p class="hint">Sélectionnez d'abord un pays.</p>
+                </div>
               </div>
-            </div>
 
-            <div class="field">
-              <label for="phone">Numéro du destinataire</label>
-              <div class="phone-input">
-                <span class="phone-input__prefix" id="recipient-dial-code">+—</span>
-                <input type="tel" id="phone" name="phone" placeholder="Ex : 0102030405" required />
+              <div class="field">
+                <label for="phone">Numéro du destinataire</label>
+                <div class="phone-input">
+                  <span class="phone-input__prefix" id="recipient-dial-code">+—</span>
+                  <input type="tel" id="phone" name="phone" placeholder="Ex : 0102030405" required />
+                </div>
+                <p class="hint" id="phone-hint">Format local, sans indicatif pays.</p>
               </div>
-              <p class="hint" id="phone-hint">Format local, sans indicatif pays.</p>
             </div>
           </fieldset>
 
@@ -113,10 +114,12 @@
             <h2 class="step-title">Montant</h2>
             <p class="step-sub">Combien voulez-vous envoyer ?</p>
 
-            <div class="field">
-              <label for="amount">Montant à envoyer <span id="currency-tag" class="currency-tag"></span></label>
-              <input type="number" id="amount" name="amount" min="1" step="1" placeholder="5000" required />
-              <p class="hint">Le destinataire reçoit exactement ce montant. Des frais Mobile Money peuvent s'appliquer côté paiement.</p>
+            <div class="fields-sheet">
+              <div class="field">
+                <label for="amount">Montant à envoyer <span id="currency-tag" class="currency-tag"></span></label>
+                <input type="number" id="amount" name="amount" min="1" step="1" placeholder="5000" required />
+                <p class="hint">Le destinataire reçoit exactement ce montant. Des frais Mobile Money peuvent s'appliquer côté paiement.</p>
+              </div>
             </div>
           </fieldset>
 
@@ -125,14 +128,16 @@
             <h2 class="step-title">Vérifiez et envoyez</h2>
             <p class="step-sub">Un dernier coup d'œil avant l'envoi.</p>
 
-            <dl class="review">
-              <div><dt>Type</dt><dd id="review-type">—</dd></div>
-              <div><dt>Votre numéro</dt><dd id="review-sender">—</dd></div>
-              <div><dt>Destinataire</dt><dd id="review-recipient">—</dd></div>
-              <div><dt>Réseau destinataire</dt><dd id="review-network">—</dd></div>
-              <div><dt>Vous envoyez</dt><dd id="review-amount">—</dd></div>
-              <div class="review__highlight"><dt>Le destinataire reçoit</dt><dd id="review-received">—</dd></div>
-            </dl>
+            <div class="fields-sheet">
+              <dl class="review">
+                <div><dt>Type</dt><dd id="review-type">—</dd></div>
+                <div><dt>Votre numéro</dt><dd id="review-sender">—</dd></div>
+                <div><dt>Destinataire</dt><dd id="review-recipient">—</dd></div>
+                <div><dt>Réseau destinataire</dt><dd id="review-network">—</dd></div>
+                <div><dt>Vous envoyez</dt><dd id="review-amount">—</dd></div>
+                <div class="review__highlight"><dt>Le destinataire reçoit</dt><dd id="review-received">—</dd></div>
+              </dl>
+            </div>
           </fieldset>
 
           <p class="error" id="form-error" role="alert"></p>
@@ -149,20 +154,22 @@
 
       <!-- ===================== SUIVI DU TRANSFERT ===================== -->
       <section class="panel is-hidden" id="panel-status">
-        <div class="status" id="status-visual">
-          <div class="status__ring" id="status-ring">
-            <div class="status__icon" id="status-icon">↻</div>
+        <div class="status-card">
+          <div class="status" id="status-visual">
+            <div class="status__ring" id="status-ring">
+              <div class="status__icon" id="status-icon">↻</div>
+            </div>
+            <p class="status__title" id="status-title">Transfert en cours…</p>
+            <p class="status__message" id="status-message">Nous attendons la confirmation du paiement.</p>
           </div>
-          <p class="status__title" id="status-title">Transfert en cours…</p>
-          <p class="status__message" id="status-message">Nous attendons la confirmation du paiement.</p>
-        </div>
 
-        <dl class="summary" id="summary">
-          <div><dt>Destinataire</dt><dd id="summary-phone"></dd></div>
-          <div><dt>Réseau</dt><dd id="summary-network"></dd></div>
-          <div><dt>Montant</dt><dd id="summary-amount"></dd></div>
-          <div><dt>Référence</dt><dd id="summary-token"></dd></div>
-        </dl>
+          <dl class="summary" id="summary">
+            <div><dt>Destinataire</dt><dd id="summary-phone"></dd></div>
+            <div><dt>Réseau</dt><dd id="summary-network"></dd></div>
+            <div><dt>Montant</dt><dd id="summary-amount"></dd></div>
+            <div><dt>Référence</dt><dd id="summary-token"></dd></div>
+          </dl>
+        </div>
 
         <button type="button" id="new-transfer-btn" class="btn-secondary is-hidden">Nouveau transfert</button>
       </section>

@@ -7,40 +7,37 @@
   <meta name="description" content="Confirmation de votre transfert Mobile Money." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <div class="scene">
-    <div class="scene__glow"></div>
 
     <main class="card" id="card">
 
       <div class="brand">
-        <span class="brand__mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <span class="brand__name">Kouamé Paiement</span>
+        <span class="brand__name">Kouamé<strong>Paiement</strong></span>
+        <span class="brand__badge" aria-hidden="true">?</span>
       </div>
 
       <section class="panel" id="panel-success">
-        <div class="status" id="status-visual">
-          <div class="status__ring is-success" id="status-ring">
-            <div class="status__icon" id="status-icon">✓</div>
+        <div class="status-card">
+          <div class="status" id="status-visual">
+            <div class="status__ring is-success" id="status-ring">
+              <div class="status__icon" id="status-icon">✓</div>
+            </div>
+            <p class="status__title" id="status-title">Vérification…</p>
+            <p class="status__message" id="status-message">Nous confirmons l'état de votre transfert.</p>
           </div>
-          <p class="status__title" id="status-title">Vérification…</p>
-          <p class="status__message" id="status-message">Nous confirmons l'état de votre transfert.</p>
-        </div>
 
-        <dl class="summary" id="summary">
-          <div><dt>Destinataire</dt><dd id="summary-phone">—</dd></div>
-          <div><dt>Réseau</dt><dd id="summary-network">—</dd></div>
-          <div><dt>Montant</dt><dd id="summary-amount">—</dd></div>
-          <div><dt>Référence</dt><dd id="summary-token">—</dd></div>
-        </dl>
+          <dl class="summary" id="summary">
+            <div><dt>Destinataire</dt><dd id="summary-phone">—</dd></div>
+            <div><dt>Réseau</dt><dd id="summary-network">—</dd></div>
+            <div><dt>Montant</dt><dd id="summary-amount">—</dd></div>
+            <div><dt>Référence</dt><dd id="summary-token">—</dd></div>
+          </dl>
+        </div>
 
         <a href="/" class="btn-secondary" id="new-transfer-link">Nouveau transfert</a>
       </section>

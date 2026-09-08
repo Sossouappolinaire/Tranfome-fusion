@@ -1,25 +1,35 @@
 /* ---------------------------------------------------------------------
    Kouamé Paiement — identité visuelle
-   Inspirée d'une carte d'application mobile : fond dégradé doux,
-   carte blanche arrondie, badge orange, pastilles d'étapes reliées.
+   Inspirée d'une appli mobile de paiement type "Moni" : fond clair,
+   grandes cartes colorées et arrondies, typo ronde et grasse, accents
+   vifs (violet / rose / turquoise / jaune) sur fond quasi-noir.
 --------------------------------------------------------------------- */
 
 :root {
-  --ink: #1c2333;
-  --ink-soft: #6b7280;
-  --paper: #f4f2ea;
+  --ink: #17182b;
+  --ink-soft: #6b6c80;
+  --paper: #f5f4f2;
   --surface: #ffffff;
-  --line: #e7e5df;
-  --orange: #d98a2b;
-  --orange-deep: #b5711f;
-  --orange-bg: #fbeedd;
-  --green: #2f9e6c;
-  --success: #2f9e6c;
-  --success-bg: #e7f6ee;
-  --error: #c0402c;
-  --error-bg: #fbeae5;
-  --radius: 22px;
-  --shadow: 0 24px 50px -24px rgba(28, 35, 51, 0.28);
+  --line: #ecebe8;
+
+  --purple: #5b4de0;
+  --purple-deep: #4438b8;
+  --pink: #ef5da8;
+  --pink-deep: #d43f8a;
+  --teal: #35cdb0;
+  --teal-deep: #23a88e;
+  --yellow: #f4e04d;
+  --yellow-deep: #e0c723;
+  --dark: #1c1b30;
+
+  --success: #23a88e;
+  --success-bg: #e4f8f3;
+  --error: #e5484d;
+  --error-bg: #fdecec;
+
+  --radius: 26px;
+  --radius-sm: 18px;
+  --shadow: 0 20px 45px -22px rgba(23, 24, 43, 0.25);
 }
 
 * { box-sizing: border-box; }
@@ -37,7 +47,7 @@ body {
   min-height: 100vh;
   background: var(--paper);
   color: var(--ink);
-  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-family: 'Poppins', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -49,56 +59,46 @@ body {
   align-items: center;
   justify-content: center;
   padding: 36px 16px;
-  overflow: hidden;
-}
-
-.scene__glow {
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(600px 420px at 8% 0%, rgba(233, 200, 150, 0.55), transparent 60%),
-    radial-gradient(620px 460px at 100% 100%, rgba(178, 205, 178, 0.45), transparent 60%),
-    linear-gradient(180deg, #f7f4ec, #eef1e8);
-  pointer-events: none;
-  z-index: 0;
 }
 
 .card {
   position: relative;
-  z-index: 1;
   width: 100%;
   max-width: 420px;
   background: var(--surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 28px 24px 26px;
+  padding: 24px 20px 22px;
 }
 
 /* Marque */
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 22px;
-}
-
-.brand__mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: var(--orange);
-  color: #fff;
-  flex: none;
+  justify-content: space-between;
+  margin-bottom: 18px;
 }
 
 .brand__name {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.12rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+.brand__name strong { color: var(--purple); font-weight: 800; }
+
+.brand__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--dark);
+  font-weight: 800;
+  font-size: 0.85rem;
+  flex: none;
 }
 
 /* Pastilles d'étapes reliées */
@@ -106,7 +106,7 @@ body {
   display: flex;
   align-items: center;
   list-style: none;
-  margin: 0 0 26px;
+  margin: 0 0 18px;
   padding: 0 2px;
 }
 
@@ -129,47 +129,71 @@ body {
 .dots__item::after {
   content: '';
   flex: 1;
-  height: 2px;
+  height: 3px;
   margin: 0 5px;
   background: var(--line);
+  border-radius: 2px;
   transition: background 0.2s ease;
 }
 
 .dots__item:last-child { flex: none; }
 .dots__item:last-child::after { display: none; }
 
-.dots__item.is-done::before, .dots__item.is-done::after { background: var(--green); }
+.dots__item.is-done::before, .dots__item.is-done::after { background: var(--dark); }
 .dots__item.is-active::before {
-  background: var(--orange);
-  width: 12px;
-  height: 12px;
+  background: var(--yellow-deep);
+  width: 13px;
+  height: 13px;
 }
 
-/* Formulaire / assistant par étapes */
-.wizard-step { display: none; border: none; margin: 0; padding: 0; }
+/* Cartes colorées par étape (façon appli "Moni") */
+.wizard-step {
+  display: none;
+  border: none;
+  margin: 0 0 14px;
+  padding: 22px 18px 20px;
+  border-radius: var(--radius-sm);
+  color: #fff;
+}
 .wizard-step.is-active { display: block; }
 
+.wizard-step[data-substep="1"] { background: linear-gradient(135deg, var(--purple), var(--purple-deep)); }
+.wizard-step[data-substep="2"] { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); }
+.wizard-step[data-substep="3"] { background: linear-gradient(135deg, var(--teal), var(--teal-deep)); }
+.wizard-step[data-substep="4"] { background: linear-gradient(135deg, #f7d64c, var(--yellow-deep)); color: var(--dark); }
+.wizard-step[data-substep="5"] { background: var(--dark); }
+
 .step-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.32rem;
-  font-weight: 700;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.28rem;
+  font-weight: 800;
   letter-spacing: -0.01em;
   margin: 0 0 4px;
+  text-transform: uppercase;
+  color: inherit;
 }
 
 .step-sub {
-  margin: 0 0 20px;
-  color: var(--ink-soft);
-  font-size: 0.92rem;
+  margin: 0 0 18px;
+  font-size: 0.9rem;
+  color: inherit;
+  opacity: 0.85;
 }
 
 .panel.is-hidden { display: none; }
 
-.field { margin-bottom: 16px; }
+/* "Feuille" blanche contenant les champs, posée sur la carte colorée */
+.fields-sheet {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 16px 14px 4px;
+}
+
+.field { margin-bottom: 14px; }
 
 label {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   margin-bottom: 6px;
   color: var(--ink);
@@ -205,8 +229,8 @@ select:disabled { color: var(--ink-soft); cursor: wait; }
 
 input:focus, select:focus {
   outline: none;
-  border-color: var(--orange);
-  box-shadow: 0 0 0 3px rgba(217, 138, 43, 0.16);
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(91, 77, 224, 0.16);
 }
 
 .phone-input {
@@ -224,8 +248,8 @@ input:focus, select:focus {
   padding: 0 10px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--orange-bg);
-  color: var(--orange-deep);
+  background: var(--paper);
+  color: var(--purple-deep);
   font-weight: 700;
   font-size: 0.9rem;
 }
@@ -233,9 +257,9 @@ input:focus, select:focus {
 .phone-input input { flex: 1; }
 
 .hint {
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   color: var(--ink-soft);
-  margin: 5px 2px 0;
+  margin: 5px 2px 8px;
 }
 
 /* Sélecteur de réseau : badges colorés cliquables (pas de logos de marque
@@ -262,11 +286,11 @@ input:focus, select:focus {
   text-align: left;
 }
 
-.network-chip:hover { border-color: var(--orange); }
+.network-chip:hover { border-color: var(--purple); }
 
 .network-chip.is-selected {
-  border-color: var(--orange);
-  box-shadow: 0 0 0 2px rgba(217, 138, 43, 0.18);
+  border-color: var(--purple);
+  box-shadow: 0 0 0 2px rgba(91, 77, 224, 0.18);
   background: var(--surface);
 }
 
@@ -289,9 +313,9 @@ input:focus, select:focus {
   white-space: nowrap;
 }
 
-/* Récapitulatif (étape 5) */
+/* Récapitulatif (étape 5, carte sombre) */
 .review {
-  margin: 0 0 4px;
+  margin: 0;
   display: grid;
   gap: 14px;
 }
@@ -304,10 +328,10 @@ input:focus, select:focus {
 }
 
 .review dt { color: var(--ink-soft); }
-.review dd { margin: 0; font-weight: 700; text-align: right; }
+.review dd { margin: 0; font-weight: 700; text-align: right; color: var(--ink); }
 
 .review__highlight dd {
-  color: var(--orange-deep);
+  color: var(--purple-deep);
   font-size: 1.15rem;
 }
 
@@ -321,15 +345,15 @@ button {
 .wizard-nav {
   display: flex;
   gap: 10px;
-  margin-top: 22px;
+  margin-top: 4px;
 }
 
 .btn-secondary, .btn-primary {
   display: block;
   width: 100%;
   flex: 1;
-  padding: 13px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 14px;
   font-size: 0.95rem;
   font-weight: 700;
   text-align: center;
@@ -340,35 +364,39 @@ button {
 
 .btn-secondary {
   background: transparent;
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--line);
   color: var(--ink);
 }
-.btn-secondary:hover { border-color: var(--orange); color: var(--orange-deep); }
+.btn-secondary:hover { border-color: var(--purple); color: var(--purple-deep); }
 .btn-secondary.is-hidden, .btn-primary.is-hidden { display: none; }
-.btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; }
-
-.foot-note { margin-top: 22px; }
-#new-transfer-btn, #new-transfer-link { margin-top: 18px; }
+.btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary {
-  background: var(--orange);
-  color: #fff;
+  background: var(--yellow);
+  color: var(--dark);
 }
-.btn-primary:hover:not(:disabled) { filter: brightness(1.06); }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.04); }
 .btn-primary:active:not(:disabled) { transform: translateY(1px); }
-.btn-primary:disabled { background: #b9bcc4; cursor: not-allowed; }
+.btn-primary:disabled { background: #ddd9c8; color: #999; cursor: not-allowed; }
 
 .error {
-  margin: 14px 0 0;
+  margin: 12px 2px 0;
   font-size: 0.85rem;
   color: var(--error);
   min-height: 1em;
 }
 
-/* Statut (suivi du transfert) */
+/* Statut (suivi du transfert) — carte sombre comme l'étape 5 */
+.status-card {
+  background: var(--dark);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 26px 20px 20px;
+}
+
 .status {
   text-align: center;
-  padding: 6px 0 8px;
+  padding: 0 0 6px;
 }
 
 .status__ring {
@@ -379,8 +407,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--orange-bg);
-  border: 2px solid var(--orange);
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--yellow);
 }
 
 .status__ring.is-spinning .status__icon {
@@ -390,7 +418,7 @@ button {
 .status__ring.is-success { border-color: var(--success); background: var(--success-bg); }
 .status__ring.is-failed { border-color: var(--error); background: var(--error-bg); }
 
-.status__icon { font-size: 1.5rem; color: var(--orange-deep); }
+.status__icon { font-size: 1.5rem; color: var(--yellow); }
 .status__ring.is-success .status__icon { color: var(--success); }
 .status__ring.is-failed .status__icon { color: var(--error); }
 
@@ -400,22 +428,23 @@ button {
 }
 
 .status__title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
-  font-size: 1.12rem;
+  font-size: 1.14rem;
   margin: 0 0 4px;
+  color: #fff;
 }
 
 .status__message {
   font-size: 0.86rem;
-  color: var(--ink-soft);
+  color: rgba(255, 255, 255, 0.75);
   margin: 0;
 }
 
 .summary {
-  margin: 22px 0 0;
+  margin: 20px 0 0;
   padding-top: 16px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   display: grid;
   gap: 10px;
 }
@@ -427,19 +456,19 @@ button {
   font-size: 0.85rem;
 }
 
-.summary dt { color: var(--ink-soft); }
-.summary dd { margin: 0; font-weight: 600; text-align: right; }
+.summary dt { color: rgba(255, 255, 255, 0.6); }
+.summary dd { margin: 0; font-weight: 600; text-align: right; color: #fff; }
+
+#new-transfer-btn, #new-transfer-link { margin-top: 16px; }
 
 .foot-note {
-  position: relative;
-  z-index: 1;
-  margin-top: 22px;
+  margin-top: 20px;
   font-size: 0.76rem;
   color: var(--ink-soft);
   text-align: center;
 }
 
 @media (max-width: 480px) {
-  .card { padding: 24px 18px 22px; }
-  .step-title { font-size: 1.18rem; }
+  .card { padding: 22px 16px 20px; }
+  .step-title { font-size: 1.14rem; }
 }
